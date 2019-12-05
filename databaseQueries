@@ -1,0 +1,69 @@
+DROP TABLE  IF EXISTS Hospital_MedicalRecords;
+
+CREATE TABLE Hospital_MedicalRecords (
+recNo INTEGER UNSIGNED,
+patient CHAR(9), -- because they are foreign keys and type in other table is CHAR(9)?
+doctor CHAR(9),
+enteredOn TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+diagnosis MEDIUMTEXT NOT NULL, -- MEDIUMTEXT is a 6,777,215 LIMIT = 2^24 bytes
+treatment VARCHAR(1000), -- text or varchar??
+PRIMARY KEY (recNo, patient),
+CONSTRAINT FK_patient
+	FOREIGN KEY (patient) REFERENCES Hospital_Patient(NINumber)
+	    ON DELETE CASCADE,
+CONSTRAINT FK_doctor
+	FOREIGN KEY (doctor) REFERENCES Hospital_Doctor(NINumber)
+);
+-- @@02
+ALTER TABLE Hospital_MedicalRecords
+    ADD COLUMN duration TIME;
+
+-- @@03
+SET SQL_SAFE_UPDATES = 0;-- needed because you are not using the primary key in the WHERE clause
+UPDATE Hospital_Doctor
+SET salary = salary - (salary * 10.0 / 100.0) -- note the correct date format used
+WHERE expertise  = 'ear';
+SET SQL_SAFE_UPDATES = 1;
+-- INSERT INTO Hospital_Doctor VALUES ('DD234CD1D','Gerda','Simkute','1940-06-13','Maple Street','BN29AB','12','Brighton','ear',80000,NULL);
+-- DELETE FROM Hospital_Doctor WHERE NINumber= 'DD234CD1D';
+
+-- @@04
+SELECT fname, lname, EXTRACT(YEAR FROM Hospital_Patient.dateOfBirth) born
+FROM Hospital_Patient
+    WHERE city LIKE '%right%'
+ORDER BY lname, fname;
+
+-- @@05
+SELECT NINumber, fname, lname, ROUND(weight / ((height/100) * (height/100)),3) AS BMI
+    FROM Hospital_Patient
+        WHERE EXTRACT(YEAR FROM Hospital_Patient.dateOfBirth) > 1990;
+
+-- @@06
+SELECT COUNT(*) number
+FROM Hospital_Doctor;
+
+-- @@07
+SELECT NINumber, lname, COUNT(*) numOfOperations
+    FROM Hospital_Doctor JOIN Hospital_CarriesOut ON Hospital_Doctor.NINumber = Hospital_CarriesOut.doctor
+    group by NINumber
+    ORDER BY numOfOperations DESC;
+-- @@08
+
+
+
+-- @@09
+
+
+
+-- @@10
+
+
+
+-- @@11
+
+
+
+-- @@12
+delimiter $$
+SET GLOBAL log_bin_trust_function_creators = 1;
+
